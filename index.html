@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cloudflare Trace Viewer</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="card">
+        <h1>Cloudflare Trace Viewer</h1>
+        <p class="subtitle">Menampilkan data koneksi dari Cloudflare Trace API</p>
+
+        <button id="loadBtn">Ambil Data Trace</button>
+
+        <div id="status" class="status">Belum ada data</div>
+
+        <div id="result" class="result-grid hidden">
+          <div class="item"><span class="label">IP</span><strong id="ip"></strong></div>
+          <div class="item"><span class="label">Hostname</span><strong id="h"></strong></div>
+          <div class="item"><span class="label">Country</span><strong id="loc"></strong></div>
+          <div class="item"><span class="label">City / Colo</span><strong id="colo"></strong></div>
+          <div class="item"><span class="label">HTTP</span><strong id="http"></strong></div>
+          <div class="item"><span class="label">TLS</span><strong id="tls"></strong></div>
+          <div class="item"><span class="label">User Agent</span><strong id="uag"></strong></div>
+          <div class="item"><span class="label">Visit Scheme</span><strong id="visit_scheme"></strong></div>
+          <div class="item"><span class="label">Timestamp</span><strong id="ts"></strong></div>
+          <div class="item"><span class="label">Cloudflare Instance</span><strong id="fl"></strong></div>
+          <div class="item"><span class="label">SNI</span><strong id="sni"></strong></div>
+          <div class="item"><span class="label">WARP</span><strong id="warp"></strong></div>
+          <div class="item"><span class="label">Gateway</span><strong id="gateway"></strong></div>
+          <div class="item"><span class="label">RBI</span><strong id="rbi"></strong></div>
+          <div class="item"><span class="label">Key Exchange</span><strong id="kex"></strong></div>
+          <div class="item full"><span class="label">Raw Output</span><pre id="raw"></pre></div>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
