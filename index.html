@@ -1,42 +1,230 @@
 <!DOCTYPE html>
 <html lang="id">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Cloudflare Trace Viewer</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloudflare Trace Viewer - Professional IP & Connection Info</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23F38020'/><text x='50' y='60' font-size='60' fill='white' text-anchor='middle' font-weight='bold'>CF</text></svg>">
+</head>
+<body>
+    <div class="stars"></div>
+    
     <div class="container">
-      <div class="card">
-        <h1>Cloudflare Trace Viewer</h1>
-        <p class="subtitle">Menampilkan data koneksi dari Cloudflare Trace API</p>
+        <header class="header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="16" cy="16" r="14" stroke="currentColor" stroke-width="2"/>
+                            <path d="M16 8V24M8 16H24" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <h1>Cloudflare Trace Viewer</h1>
+                </div>
+                <p class="tagline">Analisis detail koneksi jaringan & informasi IP Anda</p>
+            </div>
+        </header>
 
-        <button id="loadBtn">Ambil Data Trace</button>
+        <main class="main-content">
+            <div class="hero-card">
+                <div class="hero-text">
+                    <h2>Lihat Informasi Koneksi Anda</h2>
+                    <p>Dapatkan data detail tentang IP address, lokasi geografis, protokol jaringan, dan keamanan koneksi Anda melalui Cloudflare Trace API.</p>
+                </div>
+                <button class="btn btn-primary" id="loadBtn">
+                    <span class="btn-icon">↻</span>
+                    <span>Ambil Data Sekarang</span>
+                </button>
+                <div id="status" class="status-message"></div>
+            </div>
 
-        <div id="status" class="status">Belum ada data</div>
+            <div id="loading" class="loading hidden">
+                <div class="spinner"></div>
+                <p>Mengambil data dari Cloudflare...</p>
+            </div>
 
-        <div id="result" class="result-grid hidden">
-          <div class="item"><span class="label">IP</span><strong id="ip"></strong></div>
-          <div class="item"><span class="label">Hostname</span><strong id="h"></strong></div>
-          <div class="item"><span class="label">Country</span><strong id="loc"></strong></div>
-          <div class="item"><span class="label">City / Colo</span><strong id="colo"></strong></div>
-          <div class="item"><span class="label">HTTP</span><strong id="http"></strong></div>
-          <div class="item"><span class="label">TLS</span><strong id="tls"></strong></div>
-          <div class="item"><span class="label">User Agent</span><strong id="uag"></strong></div>
-          <div class="item"><span class="label">Visit Scheme</span><strong id="visit_scheme"></strong></div>
-          <div class="item"><span class="label">Timestamp</span><strong id="ts"></strong></div>
-          <div class="item"><span class="label">Cloudflare Instance</span><strong id="fl"></strong></div>
-          <div class="item"><span class="label">SNI</span><strong id="sni"></strong></div>
-          <div class="item"><span class="label">WARP</span><strong id="warp"></strong></div>
-          <div class="item"><span class="label">Gateway</span><strong id="gateway"></strong></div>
-          <div class="item"><span class="label">RBI</span><strong id="rbi"></strong></div>
-          <div class="item"><span class="label">Key Exchange</span><strong id="kex"></strong></div>
-          <div class="item full"><span class="label">Raw Output</span><pre id="raw"></pre></div>
-        </div>
-      </div>
+            <div id="resultContainer" class="result-container hidden">
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="overview">Ringkasan</button>
+                    <button class="tab-btn" data-tab="network">Jaringan</button>
+                    <button class="tab-btn" data-tab="security">Keamanan</button>
+                    <button class="tab-btn" data-tab="raw">Raw Data</button>
+                </div>
+
+                <!-- Overview Tab -->
+                <div id="overview" class="tab-content active">
+                    <div class="card-grid">
+                        <div class="data-card primary">
+                            <div class="card-label">IP Address</div>
+                            <div class="card-value" id="ip-overview">—</div>
+                            <div class="card-description">Alamat IP publik Anda</div>
+                        </div>
+
+                        <div class="data-card primary">
+                            <div class="card-label">Negara</div>
+                            <div class="card-value" id="loc-overview">—</div>
+                            <div class="card-description">Kode negara ISO 3166-1</div>
+                        </div>
+
+                        <div class="data-card primary">
+                            <div class="card-label">Lokasi Cloudflare</div>
+                            <div class="card-value" id="colo-overview">—</div>
+                            <div class="card-description">Data center terdekat (IATA)</div>
+                        </div>
+
+                        <div class="data-card primary">
+                            <div class="card-label">Protokol HTTP</div>
+                            <div class="card-value" id="http-overview">—</div>
+                            <div class="card-description">Versi HTTP yang digunakan</div>
+                        </div>
+
+                        <div class="data-card">
+                            <div class="card-label">Hostname</div>
+                            <div class="card-value small" id="h-overview">—</div>
+                        </div>
+
+                        <div class="data-card">
+                            <div class="card-label">Timestamp</div>
+                            <div class="card-value small" id="ts-overview">—</div>
+                            <div class="card-description" id="ts-formatted"></div>
+                        </div>
+
+                        <div class="data-card">
+                            <div class="card-label">Visit Scheme</div>
+                            <div class="card-value small" id="visit_scheme-overview">—</div>
+                        </div>
+
+                        <div class="data-card">
+                            <div class="card-label">Instance</div>
+                            <div class="card-value small" id="fl-overview">—</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Network Tab -->
+                <div id="network" class="tab-content">
+                    <div class="card-grid">
+                        <div class="data-card">
+                            <div class="card-label">IP Address</div>
+                            <div class="card-value" id="ip-network">—</div>
+                            <div class="card-description">Alamat IP publik Anda</div>
+                        </div>
+
+                        <div class="data-card">
+                            <div class="card-label">Protokol HTTP</div>
+                            <div class="card-value" id="http-network">—</div>
+                            <div class="card-description">HTTP/1.1, HTTP/2, HTTP/3</div>
+                        </div>
+
+                        <div class="data-card">
+                            <div class="card-label">Visit Scheme</div>
+                            <div class="card-value" id="visit_scheme-network">—</div>
+                            <div class="card-description">HTTP atau HTTPS</div>
+                        </div>
+
+                        <div class="data-card">
+                            <div class="card-label">Lokasi Cloudflare</div>
+                            <div class="card-value" id="colo-network">—</div>
+                            <div class="card-description">Kode IATA lokasi edge</div>
+                        </div>
+
+                        <div class="data-card">
+                            <div class="card-label">Hostname</div>
+                            <div class="card-value" id="h-network">—</div>
+                            <div class="card-description">Web server hostname</div>
+                        </div>
+
+                        <div class="data-card">
+                            <div class="card-label">Splitter Request</div>
+                            <div class="card-value" id="sliver-network">—</div>
+                            <div class="card-description">Request dipecah atau tidak</div>
+                        </div>
+
+                        <div class="data-card">
+                            <div class="card-label">User Agent</div>
+                            <div class="card-value small" id="uag-network">—</div>
+                            <div class="card-description">Browser & OS info</div>
+                        </div>
+
+                        <div class="data-card">
+                            <div class="card-label">Timestamp</div>
+                            <div class="card-value small" id="ts-network">—</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Tab -->
+                <div id="security" class="tab-content">
+                    <div class="card-grid">
+                        <div class="data-card security-highlight">
+                            <div class="card-label">TLS/SSL Version</div>
+                            <div class="card-value" id="tls-security">—</div>
+                            <div class="card-description">Versi enkripsi yang digunakan</div>
+                        </div>
+
+                        <div class="data-card security-highlight">
+                            <div class="card-label">SNI Status</div>
+                            <div class="card-value" id="sni-security">—</div>
+                            <div class="card-description">Server Name Indication</div>
+                        </div>
+
+                        <div class="data-card security-highlight">
+                            <div class="card-label">Key Exchange</div>
+                            <div class="card-value" id="kex-security">—</div>
+                            <div class="card-description">Metode pertukaran kunci TLS</div>
+                        </div>
+
+                        <div class="data-card">
+                            <div class="card-label">WARP VPN</div>
+                            <div class="card-value" id="warp-security">—</div>
+                            <div class="card-description">Cloudflare WARP aktif</div>
+                        </div>
+
+                        <div class="data-card">
+                            <div class="card-label">Gateway</div>
+                            <div class="card-value" id="gateway-security">—</div>
+                            <div class="card-description">Cloudflare Gateway aktif</div>
+                        </div>
+
+                        <div class="data-card">
+                            <div class="card-label">RBI</div>
+                            <div class="card-value" id="rbi-security">—</div>
+                            <div class="card-description">Remote Browser Isolation</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Raw Data Tab -->
+                <div id="raw" class="tab-content">
+                    <div class="raw-output">
+                        <div class="copy-section">
+                            <button class="btn btn-secondary btn-small" id="copyBtn">
+                                <span>📋 Salin Data</span>
+                            </button>
+                        </div>
+                        <pre id="raw-data">—</pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h3>Tentang Data Ini</h3>
+                <p>Data ini diambil dari <strong>Cloudflare Trace API</strong>, endpoint publik yang mengembalikan informasi detail tentang koneksi Anda. Kami tidak menyimpan data Anda - semua proses terjadi di browser Anda.</p>
+                <ul>
+                    <li><strong>IP Address:</strong> Alamat IP publik yang dikenali oleh Cloudflare</li>
+                    <li><strong>Lokasi:</strong> Lokasi geografis berdasarkan geolocation database Cloudflare</li>
+                    <li><strong>Protokol:</strong> Versi HTTP dan TLS/SSL yang digunakan untuk koneksi</li>
+                    <li><strong>Keamanan:</strong> Status enkripsi dan perlindungan koneksi Anda</li>
+                </ul>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>Cloudflare Trace Viewer | Powered by <a href="https://one.one.one.one/" target="_blank">Cloudflare DNS</a> | Data diambil secara real-time dari browser Anda</p>
+        </footer>
     </div>
 
     <script src="script.js"></script>
-  </body>
+</body>
 </html>
